@@ -4,9 +4,10 @@ use ratatui::crossterm::terminal::{
     disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen,
 };
 use ratatui::backend::CrosstermBackend;
-use ratatui::widgets::{Block, Borders};
+use ratatui::widgets::{Block, Borders, BorderType, Padding};
 use ratatui::Terminal;
 use ratatui::crossterm::event::{Event, KeyEvent, KeyCode, KeyModifiers};
+use ratatui::prelude::Stylize;
 
 use std::io;
 use tui_textarea::{Input, Key, TextArea};
@@ -25,10 +26,15 @@ fn main() -> io::Result<()> {
     textarea.set_max_histories(1000);
     // Make the current line just be normal (could also make it bold, italic, or bg color or something here)
     textarea.set_cursor_line_style(Style::default());
+
+    let input_style = Style::default().bg(Color::from_u32(0x00222222)).fg(Color::White);
     textarea.set_block(
         Block::default()
-            .borders(Borders::ALL)
-            .title("Crossterm Minimal Example"),
+            .style(input_style)
+            .borders(Borders::LEFT)
+            .border_type(BorderType::QuadrantOutside)
+            .border_style(Style::default().fg(Color::from_u32(0x008888ff)))
+            .padding(Padding::symmetric(2, 1))
     );
 
     loop {
