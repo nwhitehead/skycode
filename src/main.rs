@@ -4,10 +4,10 @@ use ratatui::crossterm::terminal::{
     disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen,
 };
 use ratatui::backend::CrosstermBackend;
-use ratatui::widgets::{Block, Borders, BorderType, Padding};
+use ratatui::widgets::{Block, Borders, BorderType, Padding, Paragraph};
 use ratatui::Terminal;
 use ratatui::crossterm::event::{Event, KeyEvent, KeyCode, KeyModifiers};
-use ratatui::prelude::Stylize;
+use ratatui::prelude::*;
 
 use std::io;
 use tui_textarea::{Input, Key, TextArea};
@@ -27,15 +27,21 @@ fn main() -> io::Result<()> {
     // Make the current line just be normal (could also make it bold, italic, or bg color or something here)
     textarea.set_cursor_line_style(Style::default());
 
-    let input_style = Style::default().bg(Color::from_u32(0x00222222)).fg(Color::White);
     textarea.set_block(
         Block::default()
-            .style(input_style)
+            .style(Style::default().bg(Color::from_u32(0x00222222)).fg(Color::White))
             .borders(Borders::LEFT)
             .border_type(BorderType::QuadrantOutside)
             .border_style(Style::default().fg(Color::from_u32(0x008888ff)))
             .padding(Padding::symmetric(2, 1))
     );
+
+    let mut statusarea = Paragraph::new("Status")
+        .block(Block::new()
+            .style(Style::default().bg(Color::from_u32(0x00141414)).fg(Color::White).add_modifier(Modifier::BOLD))
+            .borders(Borders::NONE)
+            .padding(Padding::symmetric(2, 1))
+        );
 
     loop {
         // Show line numbers if there is more than 1 line
@@ -44,7 +50,17 @@ fn main() -> io::Result<()> {
             textarea.set_line_number_style(Style::default().fg(Color::Gray).add_modifier(Modifier::DIM));
         }
         term.draw(|f| {
-            f.render_widget(&textarea, f.area());
+
+            let outer_layout = Layout::default()
+                .direction(Direction::Horizontal)
+                .constraints(vec![
+                    Constraint::Percentage(100),
+                    Constraint::Min(40),
+                ])
+                .split(f.area());
+
+            f.render_widget(&textarea, outer_layout[0]);
+            f.render_widget(&statusarea, outer_layout[1]);
         })?;
         let inp = ratatui::crossterm::event::read()?;
         let inp_r: tui_textarea::Input = inp.clone().into();
