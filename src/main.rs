@@ -20,7 +20,7 @@ fn main() -> io::Result<()> {
 
     let mut textarea = TextArea::default();
     textarea.set_max_histories(1000);
-    textarea.set_line_number_style(Style::default().fg(Color::DarkGray));
+    textarea.set_line_number_style(Style::default().fg(Color::Gray).add_modifier(Modifier::DIM));
     //textarea.set_cursor_line_style(Style::default().add_modifier(Modifier::ITALIC));
     textarea.set_cursor_line_style(Style::default());
     textarea.set_block(
@@ -33,8 +33,17 @@ fn main() -> io::Result<()> {
         term.draw(|f| {
             f.render_widget(&textarea, f.area());
         })?;
-        match ratatui::crossterm::event::read()?.into() {
+        let inp = ratatui::crossterm::event::read()?;
+        let inp_r: tui_textarea::Input = inp.into();
+        match inp_r {
             Input { key: Key::Esc, .. } => break,
+            input @Input { key: Key::Enter, .. } => {
+                if textarea.lines().len() == 1 {
+                    break
+                } else {
+                    textarea.input(input);
+                }
+            },
             input => {
                 textarea.input(input);
             }

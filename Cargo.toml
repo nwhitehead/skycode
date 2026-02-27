@@ -7,3 +7,6 @@ edition = "2024"
 crossterm = { version= "0.29.0", features = ["events"] }
 ratatui = "0.29.0"
 tui-textarea = "0.7.0"
+
+[[example]]
+name = "input_test"
