@@ -6,7 +6,8 @@ use ratatui::crossterm::terminal::{
 use ratatui::backend::CrosstermBackend;
 use ratatui::widgets::{Block, Borders, BorderType, Padding, Paragraph};
 use ratatui::Terminal;
-use ratatui::crossterm::event::{Event, KeyEvent, KeyCode, KeyModifiers};
+use ratatui::crossterm::event::{Event, KeyEvent, MouseEventKind, MouseEvent, KeyCode, KeyModifiers};
+use ratatui::crossterm::event::MouseEventKind::{ ScrollDown, ScrollUp };
 use ratatui::prelude::*;
 
 use std::io;
@@ -38,7 +39,7 @@ fn main() -> io::Result<()> {
     let stdout = io::stdout();
     let mut stdout = stdout.lock();
     let mut output = vec![String::from("this is some output")];
-    for i in 0..100 {
+    for i in 0..50 {
         let mut line = vec![];
         for j in 0..100 {
             line.push(format!("{} ", j * (i + 17)));
@@ -52,6 +53,7 @@ fn main() -> io::Result<()> {
     let mut term = Terminal::new(backend)?;
 
     let mut textarea = fresh_input_textarea();
+    let mut output_scroll: i32 = 0;
 
     loop {
         // Show line numbers if there is more than 1 line
@@ -59,7 +61,7 @@ fn main() -> io::Result<()> {
         if textarea.lines().len() > 1 {
             textarea.set_line_number_style(Style::default().fg(Color::Gray).add_modifier(Modifier::DIM));
         }
-        let mut output_area = Paragraph::new(output.join("\n"));
+        let mut output_area = Paragraph::new(output.join("\n")).scroll((output_scroll as u16, 0));
 
         let mut status_area = Paragraph::new("Status")
             .block(Block::new()
@@ -68,6 +70,7 @@ fn main() -> io::Result<()> {
                 .padding(Padding::symmetric(2, 1))
             );
 
+        let mut output_rect = Rect::default();
         term.draw(|f| {
 
             let outer_layout = Layout::default()
@@ -90,11 +93,22 @@ fn main() -> io::Result<()> {
             f.render_widget(&textarea, left_layout[1]);
             f.render_widget(&output_area, left_layout[0]);
             f.render_widget(&status_area, outer_layout[1]);
+            output_rect = left_layout[0].clone();
         })?;
 
         let inp = ratatui::crossterm::event::read()?;
         let inp_r: tui_textarea::Input = inp.clone().into();
         match inp {
+            Event::Mouse(MouseEvent { kind: ScrollDown, column, row, modifiers }) => {
+                if output_rect.contains(Position { x: column, y: row }) {
+                    output_scroll += 1;
+                }
+            }
+            Event::Mouse(MouseEvent { kind: ScrollUp, column, row, modifiers }) => {
+                if output_rect.contains(Position { x: column, y: row }) {
+                    output_scroll -= 1;
+                }
+            }
             ratatui::crossterm::event::Event::Key(KeyEvent { code: KeyCode::Esc, ..}) => break,
             // ALT-ENTER always submits
             Event::Key(KeyEvent { code: KeyCode::Enter, modifiers: KeyModifiers::ALT, ..}) => {
@@ -115,6 +129,15 @@ fn main() -> io::Result<()> {
             _ => {
                 textarea.input(inp_r);
             }
+        }
+        // Clamp scroll in case things have changed in layout etc.
+        // Max scroll cannot be less than 0
+        let max_scroll = i32::max(0, output_area.line_count(output_rect.width) as i32 - output_rect.height as i32);
+        if output_scroll < 0 {
+            output_scroll = 0;
+        }
+        if output_scroll > max_scroll {
+            output_scroll = max_scroll;
         }
     }
 
