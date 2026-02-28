@@ -47,6 +47,36 @@ fn submit(textarea: &mut TextArea, output: &mut Vec<String>, output_scroll: &mut
 #[derive(Debug, Clone)]
 struct MyStyleSheet;
 
+impl StyleSheet for MyStyleSheet {
+    fn heading(&self, level: u8) -> Style {
+        Style::new().fg(Color::from_u32(0x009679bd))
+    }
+
+    fn code(&self) -> Style {
+        Style::new().white().on_dark_gray()
+    }
+
+    fn link(&self) -> Style {
+        Style::new().blue().underlined()
+    }
+
+    fn blockquote(&self) -> Style {
+        Style::new().yellow()
+    }
+
+    fn heading_meta(&self) -> Style {
+        Style::new().dim()
+    }
+
+    fn metadata_block(&self) -> Style {
+        Style::new().light_yellow()
+    }
+
+    fn fence(&self, language: &str) -> Option<Style> {
+        None
+    }
+}
+
 fn main() -> io::Result<()> {
     let stdout = io::stdout();
     let mut stdout = stdout.lock();
@@ -60,12 +90,16 @@ fn main() -> io::Result<()> {
     }
 
     let markdown = r#"
+# Title
+
+## Section title
+
 This is a *simple* markdown renderer for Ratatui.
 
 - List item 1
 - List item 2
 
-```bash
+```rust
 fn main() {
     println!("Hello, world!");
 }
@@ -89,7 +123,7 @@ fn main() {
                 Style::default().fg(Color::Gray).add_modifier(Modifier::DIM),
             );
         }
-        let md_options = Options::default();
+        let md_options = Options::new(MyStyleSheet);
         let mut output_markdown = from_str_with_options(markdown, &md_options);
         let mut lines = vec![];
         for line in output_markdown {

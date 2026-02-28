@@ -1749,7 +1749,7 @@ dependencies = [
 [[package]]
 name = "tui-markdown"
 version = "0.3.7"
-source = "git+https://github.com/nwhitehead/tui-markdown.git#d2438c9bd151981653c6aced5fde10724ce1a87c"
+source = "git+https://github.com/nwhitehead/tui-markdown.git#31b6bfab46abb1ae37b6bef2a27740465caabdcf"
 dependencies = [
  "ansi-to-tui",
  "itertools",
