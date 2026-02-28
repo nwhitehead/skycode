@@ -50,17 +50,17 @@ fn main() -> io::Result<()> {
     }
 
     let markdown = r#"
-    This is a simple markdown renderer for Ratatui.
+This is a *simple* markdown renderer for Ratatui.
 
-    - List item 1
-    - List item 2
+- List item 1
+- List item 2
 
-    ```rust
-    fn main() {
-        println!("Hello, world!");
-    }
-    ```
-    "#;
+```
+fn main() {
+    println!("Hello, world!");
+}
+```
+"#;
 
     enable_raw_mode()?;
     ratatui::crossterm::execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
@@ -79,8 +79,22 @@ fn main() -> io::Result<()> {
         }
         let mut output_markdown = tui_markdown::from_str(markdown);
         //let mut output_area = Paragraph::new(output.join("\n"));
+        let mut lines = vec![];
+        lines.push(Line::from(vec![
+            Span::styled("Hello ", Style::default().fg(Color::Yellow)),
+            Span::styled("World", Style::default().fg(Color::Blue).bg(Color::White)),
+        ]));
+        lines.push(Line::from(vec![
+            Span::styled("Goodbye ", Style::default().fg(Color::Yellow)),
+            Span::styled("World", Style::default().fg(Color::Blue).bg(Color::White)),
+        ]));
+        for line in output_markdown {
+            lines.push(line);
+        }
+        let text = Text::from(lines);
 
-        let mut output_area = Paragraph::new(output_markdown);
+
+        let mut output_area = Paragraph::new(text);
         // Clamp scroll in case things have changed in layout etc.
         // Max scroll cannot be less than 0
         let max_scroll = i32::max(0, output_area.line_count(output_rect.width) as i32 - output_rect.height as i32);
