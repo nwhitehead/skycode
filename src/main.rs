@@ -49,7 +49,13 @@ struct MyStyleSheet;
 
 impl StyleSheet for MyStyleSheet {
     fn heading(&self, level: u8) -> Style {
-        Style::new().fg(Color::from_u32(0x009679bd))
+        match level {
+            1 => Style::new().fg(Color::from_u32(0x009679bd)).reversed(),
+            2 => Style::new().fg(Color::from_u32(0x009679bd)).bold(),
+            3 => Style::new().fg(Color::from_u32(0x009679bd)),
+            4 => Style::new().fg(Color::from_u32(0x009679bd)).italic(),
+            _ => Style::new().fg(Color::from_u32(0x009679bd)),
+        }
     }
 
     fn code(&self) -> Style {
@@ -72,8 +78,16 @@ impl StyleSheet for MyStyleSheet {
         Style::new().light_yellow()
     }
 
-    fn fence(&self, language: &str) -> Option<Style> {
-        None
+    fn image_alt(&self) -> Style {
+        Style::new().dim().italic()
+    }
+
+    fn table_header(&self) -> Style {
+        Style::new().bold().cyan()
+    }
+
+    fn table_border(&self) -> Style {
+        Style::new().dark_gray()
     }
 }
 
@@ -99,11 +113,18 @@ This is a *simple* markdown renderer for Ratatui.
 - List item 1
 - List item 2
 
+### Code Sample
+
 ```rust
 fn main() {
     println!("Hello, world!");
 }
 ```
+
+#### Deep sections
+
+The $x$ in the $x^2$ is not $5$.
+
 "#;
 
     enable_raw_mode()?;
@@ -115,6 +136,13 @@ fn main() {
     let mut output_scroll: i32 = 0;
 
     let mut output_rect = Rect::default();
+
+    let mut history = vec![];
+    for i in 0..100 {
+        history.push(format!("prompt {}", i));
+    }
+    let history_index = history.len();
+
     loop {
         // Show line numbers if there is more than 1 line
         textarea.remove_line_number();
@@ -123,7 +151,11 @@ fn main() {
                 Style::default().fg(Color::Gray).add_modifier(Modifier::DIM),
             );
         }
-        let md_options = Options::new(MyStyleSheet);
+        let md_options = Options::new(MyStyleSheet)
+            .with_show_math_marks(false)
+            .with_show_header_marks(false)
+            .with_show_code_fence(false)
+            .with_show_code_line_numbers(false);
         let mut output_markdown = from_str_with_options(markdown, &md_options);
         let mut lines = vec![];
         for line in output_markdown {
@@ -199,6 +231,12 @@ fn main() {
                     output_scroll -= 1;
                 }
             }
+
+            // UP submits
+            Event::Key(KeyEvent {
+                code: KeyCode::Up, ..
+            }) => submit(&mut textarea, &mut output, &mut output_scroll),
+
             ratatui::crossterm::event::Event::Key(KeyEvent {
                 code: KeyCode::Esc, ..
             }) => break,

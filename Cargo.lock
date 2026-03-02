@@ -1749,7 +1749,7 @@ dependencies = [
 [[package]]
 name = "tui-markdown"
 version = "0.3.7"
-source = "git+https://github.com/nwhitehead/tui-markdown.git#679a7d20a5b8037e3b5e617a021d6036b38b2824"
+source = "git+https://github.com/nwhitehead/tui-markdown.git#7895fae2c0672193fd0b7021602cb9b8e3918e93"
 dependencies = [
  "ansi-to-tui",
  "itertools",
@@ -1759,6 +1759,7 @@ dependencies = [
  "rstest",
  "syntect",
  "tracing",
+ "unicode-width",
 ]
 
 [[package]]
