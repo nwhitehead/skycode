@@ -1,9 +1,9 @@
-# SkyCode
+# CritterCoder
 
 > [!WARNING]
 > In development, not done!
 
-SkyCode is an open source AI coding agent.
+CritterCoder is an open source AI coding agent.
 
 This application is an open source coding agent harness inspired by
 [ClaudeCode](https://github.com/anthropics/claude-code),
