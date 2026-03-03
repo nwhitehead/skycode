@@ -20,9 +20,16 @@ Features:
     * Local LLM server with [ollama](https://github.com/ollama/ollama)
     * Anthropic, OpenAI, Google Gemini etc.
 * Quick select agent roles and permissions
+    * Plan, build, work
+    * Write specifications, verify specifications
+    * Review code, track down bugs
 * Parallel agent tracking and supervision
+    * Manage a virtual AI agent team
 * Persona support
 * Deep agentic tools support
 * Stateful memory
+    * Automatically track sessions
+    * Learn your styles and preferences
 * Task tracking
+    * Tooling support for issue progress
 * Automatic context compaction and optimization
