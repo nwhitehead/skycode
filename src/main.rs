@@ -14,12 +14,34 @@ use ratatui::widgets::{Block, BorderType, Borders, Padding, Paragraph};
 use std::io;
 use tui_markdown::from_str_with_options;
 use tui_textarea::{Input, Key, TextArea};
+use image::{ImageReader, GenericImageView};
+use std::io::Cursor;
 
 mod stylesheet;
 use stylesheet::get_md_options;
 
 pub trait EventHandler {
     fn handle(event: &ratatui::crossterm::event::Event) -> bool;
+}
+
+struct Critter {
+
+}
+
+impl Critter {
+    fn new(data: Vec<u8>) -> Self {
+        let mut reader = ImageReader::new(Cursor::new(data))
+            .with_guessed_format()
+            .expect("Cursor IO never fails");
+        let image = reader.decode().expect("Image is valid");
+        let (width, height) = image.dimensions();
+        Self {}
+    }
+}
+impl Widget for &Critter {
+    fn render(self, area: Rect, buf: &mut Buffer) {
+
+    }
 }
 
 fn fresh_input_textarea() -> TextArea<'static> {
@@ -96,10 +118,6 @@ The $x$ in the $x^2$ is not $5$.
 
 "#;
 
-    // let cat_image: &[u8] = include_bytes!("../resources/cat.ansi");
-    // let cat_string: String =
-    //     String::from_utf8(cat_image.to_vec()).expect("cat must be valid utf-8");
-
     enable_raw_mode()?;
     ratatui::crossterm::execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
     let backend = CrosstermBackend::new(stdout);
@@ -115,6 +133,7 @@ The $x$ in the $x^2$ is not $5$.
         history.push(format!("prompt {}", i));
     }
     //let history_index = history.len();
+    let critter = Critter::new(include_bytes!("../resources/cat.png").to_vec());
 
     loop {
         // Show line numbers in input if there is more than 1 line
@@ -176,7 +195,8 @@ The $x$ in the $x^2$ is not $5$.
             output_rect = left_layout[0].clone();
 
             f.render_widget(&textarea, left_layout[1]);
-            f.render_widget(&output_area, left_layout[0]);
+            f.render_widget(&critter, left_layout[0]);
+            //f.render_widget(&output_area, left_layout[0]);
             f.render_widget(&status_area, outer_layout[1]);
         })?;
 
