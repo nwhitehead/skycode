@@ -60,3 +60,15 @@ impl StyleSheet for AppStyleSheet {
         Style::new().fg(self.palette.muted)
     }
 }
+
+pub fn get_theme() -> Theme {
+    Theme::new(ThemeName::OneDarkPro)
+}
+
+pub fn get_md_options() -> Options<AppStyleSheet> {
+    Options::new(AppStyleSheet::new(get_theme()))
+        .with_show_math_marks(false)
+        .with_show_header_marks(false)
+        .with_show_code_fence(false)
+        .with_show_code_line_numbers(false)
+}

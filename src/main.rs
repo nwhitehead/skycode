@@ -20,7 +20,7 @@ use tui_textarea::{Input, Key, TextArea};
 use ratatui_themes::{Theme, ThemeName, ThemePalette};
 
 mod stylesheet;
-use stylesheet::AppStyleSheet;
+use stylesheet::get_md_options;
 
 pub trait EventHandler {
     fn handle(event: &ratatui::crossterm::event::Event) -> bool;
@@ -128,12 +128,7 @@ The $x$ in the $x^2$ is not $5$.
             );
         }
 
-        let theme = Theme::new(ThemeName::OneDarkPro);
-        let md_options = Options::new(AppStyleSheet::new(theme))
-            .with_show_math_marks(false)
-            .with_show_header_marks(false)
-            .with_show_code_fence(false)
-            .with_show_code_line_numbers(false);
+        let md_options = get_md_options();
         let mut output_markdown = from_str_with_options(markdown, &md_options);
         let mut lines = vec![];
         for line in output_markdown {
