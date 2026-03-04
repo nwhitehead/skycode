@@ -2,11 +2,11 @@ use image::{ImageReader, Pixel, RgbaImage};
 use ratatui::prelude::*;
 use std::io::Cursor;
 
-pub struct Critter {
+pub struct TextImage {
     img: RgbaImage,
 }
 
-impl Critter {
+impl TextImage {
     pub fn new(data: Vec<u8>) -> Self {
         let reader = ImageReader::new(Cursor::new(data))
             .with_guessed_format()
@@ -18,7 +18,7 @@ impl Critter {
     }
 }
 
-impl Widget for &Critter {
+impl Widget for &TextImage {
     fn render(self, area: Rect, buf: &mut Buffer) {
         let (width, height) = self.img.dimensions();
         let mut rows = vec![];

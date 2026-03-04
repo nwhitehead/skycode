@@ -1,6 +1,6 @@
 # CritterCoder
 
-<img src="resources/bigcat.png" style="width:80px; aspect-ratio: fixed;" alt="Small orange and white cat.">
+<img src="resources/bigdog.png" style="width:80px; aspect-ratio: fixed;" alt="Small orange and white dog.">
 
 > [!WARNING]
 > In development, not done!

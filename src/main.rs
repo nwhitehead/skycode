@@ -13,11 +13,11 @@ use std::io;
 use tui_markdown::from_str_with_options;
 use tui_textarea::{Input, Key, TextArea};
 
-mod critter;
 mod status;
 mod stylesheet;
-use critter::Critter;
+mod textimage;
 use stylesheet::get_md_options;
+use textimage::TextImage;
 
 pub trait EventHandler {
     fn handle(event: &ratatui::crossterm::event::Event) -> bool;
@@ -112,7 +112,7 @@ The $x$ in the $x^2$ is not $5$.
         history.push(format!("prompt {}", i));
     }
     //let history_index = history.len();
-    let critter = Critter::new(include_bytes!("../resources/cat.png").to_vec());
+    let critter = TextImage::new(include_bytes!("../resources/fox.png").to_vec());
 
     loop {
         // Show line numbers in input if there is more than 1 line
